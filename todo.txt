@@ -1,0 +1,14 @@
+
+bug: when editing time sheet in time cannot be greater than out time
+
+check next day popup feature
+
+move calculateTotal for day to helper or somewhere out of backend
+
+scheduled flush to csv (backup)
+
+use actions
+
+time chart- implement undo and redo
+    http://docs.oracle.com/javase/tutorial/uiswing/events/undoableeditlistener.html
+    http://www.roseindia.net/tutorial/java/swing/undoredo.html
