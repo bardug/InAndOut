@@ -1,3 +1,3 @@
 InAndOut
 ========
-A very simple and basic attendence recorder in its early stages
+A very simple and basic attendance recorder in its early stages
