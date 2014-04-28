@@ -75,15 +75,13 @@ public class TimeChartDialog extends JDialog {
 
         prepareTable();
 
-        prepareModel();
-
         getContentPane().add(new JScrollPane(table));
 
-        table.removeColumn(table.getColumn("ID"));
-
-        prepareCellAttributes();
-
         prepareHeaderRenderer();
+
+        prepareModel();
+
+        fixColumnsAndPrepareCellAttributes();
     }
 
     private void prepareTable() {
@@ -96,6 +94,12 @@ public class TimeChartDialog extends JDialog {
         table.setModel(new TimeChartTableModel(tableModel2DArray));
 
         addModelListener();
+    }
+
+    private void fixColumnsAndPrepareCellAttributes() {
+        table.removeColumn(table.getColumn("ID"));
+
+        prepareCellAttributes();
     }
 
     private void addModelListener() {
@@ -140,18 +144,28 @@ public class TimeChartDialog extends JDialog {
     private JPanel getLoadMonthPanel() {
         JPanel loadMonthPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
         loadMonthPanel.add(new JLabel("Load some other month:"));
-        Object[] previousMonths = backend.getPreviousMonths(new Callback() {
-            @Override
-            public void runCallback() {
-            }
-
-            @Override
-            public void runCallbackWithText(String text) {
-                InAndOutErrorHandler.popErrorDialog(text, getContentPane());
-            }
-        });
+        Object[] previousMonths = getPreviousMonths();
         JComboBox<Object> monthsCombo = new JComboBox<>(previousMonths);
-        monthsCombo.addActionListener(new ActionListener() {
+        monthsCombo.addActionListener(getComboBoxListener());
+        loadMonthPanel.add(monthsCombo);
+        return loadMonthPanel;
+    }
+
+    private Object[] getPreviousMonths() {
+        return backend.getPreviousMonths(new Callback() {
+                @Override
+                public void runCallback() {
+                }
+
+                @Override
+                public void runCallbackWithText(String text) {
+                    InAndOutErrorHandler.popErrorDialog(text, getContentPane());
+                }
+            });
+    }
+
+    private ActionListener getComboBoxListener() {
+        return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String selectedMonth = (String) ((JComboBox) e.getSource()).getSelectedItem();
@@ -166,10 +180,9 @@ public class TimeChartDialog extends JDialog {
                     }
                 });
                 table.setModel(new TimeChartTableModel(previousMonthTimeChart));
+                fixColumnsAndPrepareCellAttributes();
             }
-        });
-        loadMonthPanel.add(monthsCombo);
-        return loadMonthPanel;
+        };
     }
 
     private JPanel  getButtonsPanel() {
