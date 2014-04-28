@@ -2,9 +2,6 @@
 <project name="module_guiinfra" default="compile.module.guiinfra">
   <dirname property="module.guiinfra.basedir" file="${ant.file.module_guiinfra}"/>
   
-  <property name="module.jdk.home.guiinfra" value="${project.jdk.home}"/>
-  <property name="module.jdk.bin.guiinfra" value="${project.jdk.bin}"/>
-  <property name="module.jdk.classpath.guiinfra" value="${project.jdk.classpath}"/>
   
   <property name="compiler.args.guiinfra" value="-encoding UTF-8 -source 8 ${compiler.args}"/>
   
@@ -15,16 +12,13 @@
     <!-- Paths to be included in compilation bootclasspath -->
   </path>
   
-  <path id="guiinfra.module.production.classpath">
-    <path refid="${module.jdk.classpath.guiinfra}"/>
-  </path>
+  <path id="guiinfra.module.production.classpath"/>
   
   <path id="guiinfra.runtime.production.module.classpath">
     <pathelement location="${guiinfra.output.dir}"/>
   </path>
   
   <path id="guiinfra.module.classpath">
-    <path refid="${module.jdk.classpath.guiinfra}"/>
     <pathelement location="${guiinfra.output.dir}"/>
   </path>
   
@@ -51,15 +45,15 @@
   
   <target name="compile.module.guiinfra" depends="compile.module.guiinfra.production,compile.module.guiinfra.tests" description="Compile module GUIInfra"/>
   
-  <target name="compile.module.guiinfra.production" depends="register.custom.compilers" description="Compile module GUIInfra; production classes">
+  <target name="compile.module.guiinfra.production" description="Compile module GUIInfra; production classes">
     <mkdir dir="${guiinfra.output.dir}"/>
-    <javac2 destdir="${guiinfra.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.guiinfra}/javac">
+    <javac destdir="${guiinfra.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
       <compilerarg line="${compiler.args.guiinfra}"/>
       <bootclasspath refid="guiinfra.module.bootclasspath"/>
       <classpath refid="guiinfra.module.production.classpath"/>
       <src refid="guiinfra.module.sourcepath"/>
       <patternset refid="excluded.from.compilation.guiinfra"/>
-    </javac2>
+    </javac>
     
     <copy todir="${guiinfra.output.dir}">
       <fileset dir="${module.guiinfra.basedir}/src">
@@ -69,7 +63,7 @@
     </copy>
   </target>
   
-  <target name="compile.module.guiinfra.tests" depends="register.custom.compilers,compile.module.guiinfra.production" description="compile module GUIInfra; test classes" unless="skip.tests"/>
+  <target name="compile.module.guiinfra.tests" depends="compile.module.guiinfra.production" description="compile module GUIInfra; test classes" unless="skip.tests"/>
   
   <target name="clean.module.guiinfra" description="cleanup module">
     <delete dir="${guiinfra.output.dir}"/>

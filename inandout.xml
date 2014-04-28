@@ -56,41 +56,6 @@
     <exclude name="**/?*.clj"/>
   </patternset>
   
-  <!-- JDK definitions -->
-  
-  <property name="jdk.bin.1.8" value="${jdk.home.1.8}/bin"/>
-  <path id="jdk.classpath.1.8">
-    <fileset dir="${jdk.home.1.8}">
-      <include name="jre/lib/charsets.jar"/>
-      <include name="jre/lib/deploy.jar"/>
-      <include name="jre/lib/javaws.jar"/>
-      <include name="jre/lib/jce.jar"/>
-      <include name="jre/lib/jfr.jar"/>
-      <include name="jre/lib/jfxswt.jar"/>
-      <include name="jre/lib/jsse.jar"/>
-      <include name="jre/lib/management-agent.jar"/>
-      <include name="jre/lib/plugin.jar"/>
-      <include name="jre/lib/resources.jar"/>
-      <include name="jre/lib/rt.jar"/>
-      <include name="jre/lib/ext/access-bridge.jar"/>
-      <include name="jre/lib/ext/cldrdata.jar"/>
-      <include name="jre/lib/ext/dnsns.jar"/>
-      <include name="jre/lib/ext/jaccess.jar"/>
-      <include name="jre/lib/ext/jfxrt.jar"/>
-      <include name="jre/lib/ext/localedata.jar"/>
-      <include name="jre/lib/ext/nashorn.jar"/>
-      <include name="jre/lib/ext/sunec.jar"/>
-      <include name="jre/lib/ext/sunjce_provider.jar"/>
-      <include name="jre/lib/ext/sunmscapi.jar"/>
-      <include name="jre/lib/ext/sunpkcs11.jar"/>
-      <include name="jre/lib/ext/zipfs.jar"/>
-    </fileset>
-  </path>
-  
-  <property name="project.jdk.home" value="${jdk.home.1.8}"/>
-  <property name="project.jdk.bin" value="${jdk.bin.1.8}"/>
-  <property name="project.jdk.classpath" value="jdk.classpath.1.8"/>
-  
   
   <!-- Project Libraries -->
   
@@ -105,18 +70,6 @@
     <pathelement location="${basedir}/lib/slf4j-log4j12-1.7.5.jar"/>
     <pathelement location="${basedir}/lib/xstream.jar"/>
   </path>
-  <!-- Register Custom Compiler Taskdefs -->
-  <property name="javac2.home" value="${idea.home}/lib"/>
-  <path id="javac2.classpath">
-    <pathelement location="${javac2.home}/javac2.jar"/>
-    <pathelement location="${javac2.home}/jdom.jar"/>
-    <pathelement location="${javac2.home}/asm4-all.jar"/>
-    <pathelement location="${javac2.home}/jgoodies-forms.jar"/>
-  </path>
-  <target name="register.custom.compilers">
-    <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="javac2.classpath"/>
-    <taskdef name="instrumentIdeaExtensions" classname="com.intellij.ant.InstrumentIdeaExtensions" classpathref="javac2.classpath"/>
-  </target>
   
   <!-- Modules -->
   
@@ -136,5 +89,135 @@
   
   <target name="build.modules" depends="init, clean, compile.module.common, compile.module.guiinfra, compile.module.backend, compile.module.frontend" description="build all modules"/>
   
-  <target name="all" depends="build.modules" description="build all"/>
+  <target name="init.artifacts">
+    <property name="artifacts.temp.dir" value="${basedir}/__artifacts_temp"/>
+    <property name="artifact.output.backend:jar" value="${basedir}/out/artifacts/Backend_jar"/>
+    <property name="artifact.output.common:jar" value="${basedir}/out/artifacts/Common_jar"/>
+    <property name="artifact.output.frontend:jar" value="${basedir}/out/artifacts/Frontend_jar"/>
+    <property name="artifact.output.guiinfra:jar" value="${basedir}/out/artifacts/GUIInfra_jar"/>
+    <property name="artifact.output.inandout:jar" value="${basedir}/out/artifacts/InAndOut_jar"/>
+    <mkdir dir="${artifacts.temp.dir}"/>
+    <property name="temp.jar.path.Backend.jar" value="${artifacts.temp.dir}/Backend.jar"/>
+    <property name="temp.jar.path.Common.jar" value="${artifacts.temp.dir}/Common.jar"/>
+    <property name="temp.jar.path.Frontend.jar" value="${artifacts.temp.dir}/Frontend.jar"/>
+    <property name="temp.jar.path.GUIInfra.jar" value="${artifacts.temp.dir}/GUIInfra.jar"/>
+    <property name="temp.jar.path.InAndOut.jar" value="${artifacts.temp.dir}/InAndOut.jar"/>
+  </target>
+  
+  <target name="artifact.backend:jar" depends="init.artifacts, compile.module.backend, compile.module.common" description="Build &#39;Backend:jar&#39; artifact">
+    <property name="artifact.temp.output.backend:jar" value="${artifacts.temp.dir}/Backend_jar"/>
+    <mkdir dir="${artifact.temp.output.backend:jar}"/>
+    <jar destfile="${temp.jar.path.Backend.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
+      <zipfileset dir="${backend.output.dir}"/>
+      <zipfileset dir="${common.output.dir}"/>
+      <zipfileset src="${basedir}/lib/slf4j-log4j12-1.7.5.jar"/>
+      <zipfileset src="${basedir}/lib/xstream.jar"/>
+      <zipfileset src="${basedir}/lib/forms-1.3.0.jar"/>
+      <zipfileset src="${basedir}/lib/launch4j.jar"/>
+      <zipfileset src="${basedir}/lib/slf4j-api-1.7.5.jar"/>
+      <zipfileset src="${basedir}/lib/junit-4.10.jar"/>
+      <zipfileset src="${basedir}/lib/jna-platform-4.0.0.jar"/>
+      <zipfileset src="${basedir}/lib/log4j-1.2.14.jar"/>
+      <zipfileset src="${basedir}/lib/jna-4.0.0.jar"/>
+    </jar>
+    <copy file="${temp.jar.path.Backend.jar}" tofile="${artifact.temp.output.backend:jar}/Backend.jar"/>
+  </target>
+  
+  <target name="artifact.common:jar" depends="init.artifacts, compile.module.common" description="Build &#39;Common:jar&#39; artifact">
+    <property name="artifact.temp.output.common:jar" value="${artifacts.temp.dir}/Common_jar"/>
+    <mkdir dir="${artifact.temp.output.common:jar}"/>
+    <jar destfile="${temp.jar.path.Common.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
+      <zipfileset dir="${common.output.dir}"/>
+      <zipfileset src="${basedir}/lib/slf4j-log4j12-1.7.5.jar"/>
+      <zipfileset src="${basedir}/lib/xstream.jar"/>
+      <zipfileset src="${basedir}/lib/forms-1.3.0.jar"/>
+      <zipfileset src="${basedir}/lib/launch4j.jar"/>
+      <zipfileset src="${basedir}/lib/slf4j-api-1.7.5.jar"/>
+      <zipfileset src="${basedir}/lib/junit-4.10.jar"/>
+      <zipfileset src="${basedir}/lib/jna-platform-4.0.0.jar"/>
+      <zipfileset src="${basedir}/lib/log4j-1.2.14.jar"/>
+      <zipfileset src="${basedir}/lib/jna-4.0.0.jar"/>
+    </jar>
+    <copy file="${temp.jar.path.Common.jar}" tofile="${artifact.temp.output.common:jar}/Common.jar"/>
+  </target>
+  
+  <target name="artifact.frontend:jar" depends="init.artifacts, compile.module.frontend, compile.module.common, compile.module.guiinfra, compile.module.backend" description="Build &#39;Frontend:jar&#39; artifact">
+    <property name="artifact.temp.output.frontend:jar" value="${artifacts.temp.dir}/Frontend_jar"/>
+    <mkdir dir="${artifact.temp.output.frontend:jar}"/>
+    <jar destfile="${temp.jar.path.Frontend.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
+      <zipfileset dir="${frontend.output.dir}"/>
+      <zipfileset dir="${common.output.dir}"/>
+      <zipfileset dir="${guiinfra.output.dir}"/>
+      <zipfileset dir="${backend.output.dir}"/>
+      <zipfileset src="${basedir}/lib/slf4j-log4j12-1.7.5.jar"/>
+      <zipfileset src="${basedir}/lib/xstream.jar"/>
+      <zipfileset src="${basedir}/lib/forms-1.3.0.jar"/>
+      <zipfileset src="${basedir}/lib/launch4j.jar"/>
+      <zipfileset src="${basedir}/lib/slf4j-api-1.7.5.jar"/>
+      <zipfileset src="${basedir}/lib/junit-4.10.jar"/>
+      <zipfileset src="${basedir}/lib/jna-platform-4.0.0.jar"/>
+      <zipfileset src="${basedir}/lib/log4j-1.2.14.jar"/>
+      <zipfileset src="${basedir}/lib/jna-4.0.0.jar"/>
+    </jar>
+    <copy file="${temp.jar.path.Frontend.jar}" tofile="${artifact.temp.output.frontend:jar}/Frontend.jar"/>
+  </target>
+  
+  <target name="artifact.guiinfra:jar" depends="init.artifacts, compile.module.guiinfra" description="Build &#39;GUIInfra:jar&#39; artifact">
+    <property name="artifact.temp.output.guiinfra:jar" value="${artifacts.temp.dir}/GUIInfra_jar"/>
+    <mkdir dir="${artifact.temp.output.guiinfra:jar}"/>
+    <jar destfile="${temp.jar.path.GUIInfra.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
+      <zipfileset dir="${guiinfra.output.dir}"/>
+    </jar>
+    <copy file="${temp.jar.path.GUIInfra.jar}" tofile="${artifact.temp.output.guiinfra:jar}/GUIInfra.jar"/>
+  </target>
+  
+  <target name="artifact.inandout:jar" depends="init.artifacts, compile.module.backend, compile.module.common, compile.module.frontend, compile.module.guiinfra" description="Build &#39;InAndOut:jar&#39; artifact">
+    <property name="artifact.temp.output.inandout:jar" value="${artifacts.temp.dir}/InAndOut_jar"/>
+    <mkdir dir="${artifact.temp.output.inandout:jar}"/>
+    <jar destfile="${temp.jar.path.InAndOut.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
+      <zipfileset file="${basedir}/GUIInfra/src/META-INF/MANIFEST.MF" prefix="META-INF"/>
+      <zipfileset dir="${backend.output.dir}"/>
+      <zipfileset dir="${common.output.dir}"/>
+      <zipfileset dir="${frontend.output.dir}"/>
+      <zipfileset dir="${guiinfra.output.dir}"/>
+      <zipfileset src="${basedir}/lib/slf4j-log4j12-1.7.5.jar"/>
+      <zipfileset src="${basedir}/lib/xstream.jar"/>
+      <zipfileset src="${basedir}/lib/forms-1.3.0.jar"/>
+      <zipfileset src="${basedir}/lib/launch4j.jar"/>
+      <zipfileset src="${basedir}/lib/slf4j-api-1.7.5.jar"/>
+      <zipfileset src="${basedir}/lib/junit-4.10.jar"/>
+      <zipfileset src="${basedir}/lib/jna-platform-4.0.0.jar"/>
+      <zipfileset src="${basedir}/lib/log4j-1.2.14.jar"/>
+      <zipfileset src="${basedir}/lib/jna-4.0.0.jar"/>
+    </jar>
+    <copy file="${temp.jar.path.InAndOut.jar}" tofile="${artifact.temp.output.inandout:jar}/InAndOut.jar"/>
+  </target>
+  
+  <target name="build.all.artifacts" depends="artifact.backend:jar, artifact.common:jar, artifact.frontend:jar, artifact.guiinfra:jar, artifact.inandout:jar" description="Build all artifacts">
+    <mkdir dir="${artifact.output.backend:jar}"/>
+    <copy todir="${artifact.output.backend:jar}">
+      <fileset dir="${artifact.temp.output.backend:jar}"/>
+    </copy>
+    <mkdir dir="${artifact.output.common:jar}"/>
+    <copy todir="${artifact.output.common:jar}">
+      <fileset dir="${artifact.temp.output.common:jar}"/>
+    </copy>
+    <mkdir dir="${artifact.output.frontend:jar}"/>
+    <copy todir="${artifact.output.frontend:jar}">
+      <fileset dir="${artifact.temp.output.frontend:jar}"/>
+    </copy>
+    <mkdir dir="${artifact.output.guiinfra:jar}"/>
+    <copy todir="${artifact.output.guiinfra:jar}">
+      <fileset dir="${artifact.temp.output.guiinfra:jar}"/>
+    </copy>
+    <mkdir dir="${artifact.output.inandout:jar}"/>
+    <copy todir="${artifact.output.inandout:jar}">
+      <fileset dir="${artifact.temp.output.inandout:jar}"/>
+    </copy>
+    
+    <!-- Delete temporary files -->
+    <delete dir="${artifacts.temp.dir}"/>
+  </target>
+  
+  <target name="all" depends="build.modules, build.all.artifacts" description="build all"/>
 </project>

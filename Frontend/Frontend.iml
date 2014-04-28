@@ -9,9 +9,9 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="lib" level="project" />
-    <orderEntry type="module" module-name="Backend" />
     <orderEntry type="module" module-name="Common" />
     <orderEntry type="module" module-name="GUIInfra" />
+    <orderEntry type="module" module-name="Backend" />
   </component>
 </module>
 

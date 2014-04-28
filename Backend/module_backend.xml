@@ -2,9 +2,6 @@
 <project name="module_backend" default="compile.module.backend">
   <dirname property="module.backend.basedir" file="${ant.file.module_backend}"/>
   
-  <property name="module.jdk.home.backend" value="${project.jdk.home}"/>
-  <property name="module.jdk.bin.backend" value="${project.jdk.bin}"/>
-  <property name="module.jdk.classpath.backend" value="${project.jdk.classpath}"/>
   
   <property name="compiler.args.backend" value="-encoding UTF-8 -source 8 ${compiler.args}"/>
   
@@ -16,7 +13,6 @@
   </path>
   
   <path id="backend.module.production.classpath">
-    <path refid="${module.jdk.classpath.backend}"/>
     <path refid="library.lib.classpath"/>
     <pathelement location="${common.output.dir}"/>
   </path>
@@ -28,7 +24,6 @@
   </path>
   
   <path id="backend.module.classpath">
-    <path refid="${module.jdk.classpath.backend}"/>
     <pathelement location="${backend.output.dir}"/>
     <path refid="library.lib.classpath"/>
     <pathelement location="${common.testoutput.dir}"/>
@@ -66,15 +61,15 @@
   
   <target name="compile.module.backend" depends="compile.module.backend.production,compile.module.backend.tests" description="Compile module Backend"/>
   
-  <target name="compile.module.backend.production" depends="register.custom.compilers,compile.module.common" description="Compile module Backend; production classes">
+  <target name="compile.module.backend.production" depends="compile.module.common" description="Compile module Backend; production classes">
     <mkdir dir="${backend.output.dir}"/>
-    <javac2 destdir="${backend.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.backend}/javac">
+    <javac destdir="${backend.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
       <compilerarg line="${compiler.args.backend}"/>
       <bootclasspath refid="backend.module.bootclasspath"/>
       <classpath refid="backend.module.production.classpath"/>
       <src refid="backend.module.sourcepath"/>
       <patternset refid="excluded.from.compilation.backend"/>
-    </javac2>
+    </javac>
     
     <copy todir="${backend.output.dir}">
       <fileset dir="${module.backend.basedir}/src">
@@ -84,15 +79,15 @@
     </copy>
   </target>
   
-  <target name="compile.module.backend.tests" depends="register.custom.compilers,compile.module.backend.production" description="compile module Backend; test classes" unless="skip.tests">
+  <target name="compile.module.backend.tests" depends="compile.module.backend.production" description="compile module Backend; test classes" unless="skip.tests">
     <mkdir dir="${backend.testoutput.dir}"/>
-    <javac2 destdir="${backend.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.backend}/javac">
+    <javac destdir="${backend.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
       <compilerarg line="${compiler.args.backend}"/>
       <bootclasspath refid="backend.module.bootclasspath"/>
       <classpath refid="backend.module.classpath"/>
       <src refid="backend.module.test.sourcepath"/>
       <patternset refid="excluded.from.compilation.backend"/>
-    </javac2>
+    </javac>
     
     <copy todir="${backend.testoutput.dir}">
       <fileset dir="${module.backend.basedir}/test">

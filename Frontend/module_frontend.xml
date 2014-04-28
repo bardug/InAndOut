@@ -2,9 +2,6 @@
 <project name="module_frontend" default="compile.module.frontend">
   <dirname property="module.frontend.basedir" file="${ant.file.module_frontend}"/>
   
-  <property name="module.jdk.home.frontend" value="${project.jdk.home}"/>
-  <property name="module.jdk.bin.frontend" value="${project.jdk.bin}"/>
-  <property name="module.jdk.classpath.frontend" value="${project.jdk.classpath}"/>
   
   <property name="compiler.args.frontend" value="-encoding UTF-8 -source 8 ${compiler.args}"/>
   
@@ -16,40 +13,38 @@
   </path>
   
   <path id="frontend.module.production.classpath">
-    <path refid="${module.jdk.classpath.frontend}"/>
     <path refid="library.lib.classpath"/>
-    <pathelement location="${backend.output.dir}"/>
     <pathelement location="${common.output.dir}"/>
     <pathelement location="${guiinfra.output.dir}"/>
+    <pathelement location="${backend.output.dir}"/>
   </path>
   
   <path id="frontend.runtime.production.module.classpath">
     <pathelement location="${frontend.output.dir}"/>
     <path refid="library.lib.classpath"/>
-    <path refid="backend.runtime.production.module.classpath"/>
     <path refid="common.runtime.production.module.classpath"/>
     <path refid="guiinfra.runtime.production.module.classpath"/>
+    <path refid="backend.runtime.production.module.classpath"/>
   </path>
   
   <path id="frontend.module.classpath">
-    <path refid="${module.jdk.classpath.frontend}"/>
     <pathelement location="${frontend.output.dir}"/>
     <path refid="library.lib.classpath"/>
-    <pathelement location="${backend.testoutput.dir}"/>
-    <pathelement location="${backend.output.dir}"/>
     <pathelement location="${common.testoutput.dir}"/>
     <pathelement location="${common.output.dir}"/>
     <pathelement location="${guiinfra.testoutput.dir}"/>
     <pathelement location="${guiinfra.output.dir}"/>
+    <pathelement location="${backend.testoutput.dir}"/>
+    <pathelement location="${backend.output.dir}"/>
   </path>
   
   <path id="frontend.runtime.module.classpath">
     <pathelement location="${frontend.testoutput.dir}"/>
     <pathelement location="${frontend.output.dir}"/>
     <path refid="library.lib.classpath"/>
-    <path refid="backend.runtime.module.classpath"/>
     <path refid="common.runtime.module.classpath"/>
     <path refid="guiinfra.runtime.module.classpath"/>
+    <path refid="backend.runtime.module.classpath"/>
   </path>
   
   
@@ -76,15 +71,15 @@
   
   <target name="compile.module.frontend" depends="compile.module.frontend.production,compile.module.frontend.tests" description="Compile module Frontend"/>
   
-  <target name="compile.module.frontend.production" depends="register.custom.compilers,compile.module.backend,compile.module.common,compile.module.guiinfra" description="Compile module Frontend; production classes">
+  <target name="compile.module.frontend.production" depends="compile.module.common,compile.module.guiinfra,compile.module.backend" description="Compile module Frontend; production classes">
     <mkdir dir="${frontend.output.dir}"/>
-    <javac2 destdir="${frontend.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.frontend}/javac">
+    <javac destdir="${frontend.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
       <compilerarg line="${compiler.args.frontend}"/>
       <bootclasspath refid="frontend.module.bootclasspath"/>
       <classpath refid="frontend.module.production.classpath"/>
       <src refid="frontend.module.sourcepath"/>
       <patternset refid="excluded.from.compilation.frontend"/>
-    </javac2>
+    </javac>
     
     <copy todir="${frontend.output.dir}">
       <fileset dir="${module.frontend.basedir}/src">
@@ -94,15 +89,15 @@
     </copy>
   </target>
   
-  <target name="compile.module.frontend.tests" depends="register.custom.compilers,compile.module.frontend.production" description="compile module Frontend; test classes" unless="skip.tests">
+  <target name="compile.module.frontend.tests" depends="compile.module.frontend.production" description="compile module Frontend; test classes" unless="skip.tests">
     <mkdir dir="${frontend.testoutput.dir}"/>
-    <javac2 destdir="${frontend.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.frontend}/javac">
+    <javac destdir="${frontend.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
       <compilerarg line="${compiler.args.frontend}"/>
       <bootclasspath refid="frontend.module.bootclasspath"/>
       <classpath refid="frontend.module.classpath"/>
       <src refid="frontend.module.test.sourcepath"/>
       <patternset refid="excluded.from.compilation.frontend"/>
-    </javac2>
+    </javac>
     
     <copy todir="${frontend.testoutput.dir}">
       <fileset dir="${module.frontend.basedir}/test">
