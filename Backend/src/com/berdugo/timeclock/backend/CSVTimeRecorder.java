@@ -47,26 +47,32 @@ public class CSVTimeRecorder implements TimeRecorder {
 
     @Override
 	public void initRecorderMedia(String mediaName) throws IOException {
-		JFileChooser fr = new JFileChooser();
-		FileSystemView fw = fr.getFileSystemView();
+		logger.info("Initializing Recorder Media. Media is CSV File");
 
         File parentFolder = getCSVFilesDir();
 
         thisMonthsCSV = new File(parentFolder,
                 mediaName +
 				FILE_EXTENSION);
-		
+
+        logger.info("Recording time in file: " + thisMonthsCSV);
+
         resetTimeChart();
 
 		if (thisMonthsCSV.exists()) {
+            logger.debug(String.format("File %s was found. loading its content", thisMonthsCSV));
             loadCSV();
 		}
         else if (parentFolder.exists()){
+            logger.debug(String.format("File %s is not found. Creating file", thisMonthsCSV));
 			createCSVFile();
 		} else {
-            //noinspection ResultOfMethodCallIgnored
-            parentFolder.mkdirs();
-			createCSVFile();
+            logger.debug(String.format("File %s is not found. Creating file and all parent dirs", thisMonthsCSV));
+            boolean mkdirsResult = parentFolder.mkdirs();
+            if (!mkdirsResult) {
+                throw new RuntimeException("Failed to create parent dirs and file");
+            }
+            createCSVFile();
 		}
 	}
 
