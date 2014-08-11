@@ -222,6 +222,7 @@ public class InAndOutFrame {
                     dialog.setVisible(true);
                 } catch (Exception ex) {
                     System.out.println("REJECTED " + "_" + getClass().getName() + "_" + getClass().getEnclosingMethod() + "_" + ex.getMessage());
+                    ex.printStackTrace();
                 }
             }
             @Override

@@ -8,8 +8,10 @@ import com.berdugo.timeclock.frontend.InAndOutGUIHelper;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.*;
@@ -30,6 +32,7 @@ public class TimeChartDialog extends JDialog {
 //    private JButton saveButton;
     private BlueButton saveButton;
     private JLabel statusLabel;
+    private JLabel totalLabel;
 
     public TimeChartDialog(Backend backend) {
         this.backend = backend;
@@ -105,6 +108,14 @@ public class TimeChartDialog extends JDialog {
     private void addModelListener() {
         TableModelListener timeChartTableModelListener = new TimeChartTableModelListener(backend, new TimeChartDialogCallback(), (InvalidCellMarkerTable) table, statusLabel);
         table.getModel().addTableModelListener(timeChartTableModelListener);
+
+        TableModelListener totalChangeListener = new TableModelListener() {
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                totalLabel.setText(getTextForTotalLabel());
+            }
+        };
+        table.getModel().addTableModelListener(totalChangeListener);
     }
 
     private void prepareCellAttributes() {
@@ -146,7 +157,9 @@ public class TimeChartDialog extends JDialog {
         loadMonthPanel.add(new JLabel("Load some other month:"));
         Object[] previousMonths = getPreviousMonths();
         JComboBox<Object> monthsCombo = new JComboBox<>(previousMonths);
-        monthsCombo.addActionListener(getComboBoxListener());
+        Object currentMonth = previousMonths[previousMonths.length - 1];
+        monthsCombo.setSelectedItem(currentMonth);
+        monthsCombo.addActionListener(getComboBoxListener((String)currentMonth));
         loadMonthPanel.add(monthsCombo);
         return loadMonthPanel;
     }
@@ -164,11 +177,12 @@ public class TimeChartDialog extends JDialog {
             });
     }
 
-    private ActionListener getComboBoxListener() {
+    private ActionListener getComboBoxListener(String currentMonth) {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String selectedMonth = (String) ((JComboBox) e.getSource()).getSelectedItem();
+                saveButton.setEnabled(currentMonth.equals(selectedMonth));
                 Object[][] previousMonthTimeChart = backend.loadPreviousMonth(selectedMonth, new Callback() {
                     @Override
                     public void runCallback() {
@@ -179,7 +193,7 @@ public class TimeChartDialog extends JDialog {
                         InAndOutErrorHandler.popErrorDialog(text, getContentPane());
                     }
                 });
-                table.setModel(new TimeChartTableModel(previousMonthTimeChart));
+                ((DefaultTableModel) table.getModel()).setDataVector(previousMonthTimeChart, TimeChartTableModel.TIME_CHART_COL_NAMES);
                 fixColumnsAndPrepareCellAttributes();
             }
         };
@@ -197,10 +211,7 @@ public class TimeChartDialog extends JDialog {
         westConstraints.ipady = 4;
         westConstraints.fill = GridBagConstraints.HORIZONTAL;
 
-        JPanel totalPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-        JLabel totalLabel = getTotalTimeLabel();
-        totalPanel.setBorder(new TitledBorder(""));
-        totalPanel.add(totalLabel);
+        JPanel totalPanel = getTotalPanel();
         buttonsPane.add(totalPanel, westConstraints);
 
         GridBagConstraints eastConstraints = new GridBagConstraints();
@@ -219,7 +230,19 @@ public class TimeChartDialog extends JDialog {
         return buttonsPane;
     }
 
+    private JPanel getTotalPanel() {
+        JPanel totalPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        totalLabel = getTotalTimeLabel();
+        totalPanel.setBorder(new TitledBorder(""));
+        totalPanel.add(totalLabel);
+        return totalPanel;
+    }
+
     private JLabel getTotalTimeLabel() {
+        return new JLabel(getTextForTotalLabel());
+    }
+
+    private String getTextForTotalLabel() {
         String totalTimeForChart = backend.getTotalTimeForChart(new Callback() {
             @Override
             public void runCallback() {
@@ -230,7 +253,7 @@ public class TimeChartDialog extends JDialog {
             }
         });
 
-        return new JLabel("Total Time: " + totalTimeForChart);
+        return "Total Time: " + totalTimeForChart;
     }
 
     private JButton getDeleteRowButton() {

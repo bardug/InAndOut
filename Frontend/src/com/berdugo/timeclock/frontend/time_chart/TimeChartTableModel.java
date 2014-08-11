@@ -7,11 +7,11 @@ import javax.swing.table.DefaultTableModel;
 
 public class TimeChartTableModel extends DefaultTableModel {
 
-
+    public static Object[] TIME_CHART_COL_NAMES = new Object[] {"Date", "IN", "OUT", "Total", "ID"};
     private boolean lastRowEditable;
 
     public TimeChartTableModel(Object[][] data) {
-        super(data, new Object[] {"Date", "IN", "OUT", "Total", "ID"});
+        super(data, TIME_CHART_COL_NAMES);
         lastRowEditable = false;
     }
 

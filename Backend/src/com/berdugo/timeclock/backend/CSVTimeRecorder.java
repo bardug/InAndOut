@@ -356,17 +356,27 @@ public class CSVTimeRecorder implements TimeRecorder {
 
     @Override
     public Object[] getPreviousMonths() {
-        File csvFilesDir = getCSVFilesDir();
-        String[] csvFilesList = csvFilesDir.list();
+        File[] csvFilesList = listRelevantFiles();
         int numOfFiles = csvFilesList.length;
         String[] previousMonths = new String[numOfFiles];
         for ( int i = 0 ; i < numOfFiles; i++ ) {
-            String fileName = csvFilesList[i];
+            String fileName = csvFilesList[i].getName();
             String formattedFileName = fileName.replace(FILE_NAME_MONTH_YEAR_DELIMITER, " ").substring(0, fileName.lastIndexOf("."));
             previousMonths[i] = formattedFileName;
         }
 
-        Arrays.sort(previousMonths);
+        Arrays.sort(previousMonths, new MonthsComparator());
         return previousMonths;
+    }
+
+    private File[] listRelevantFiles() {
+        File csvFilesDir = getCSVFilesDir();
+        FilenameFilter filenameFilter = new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.matches(".*[.]csv");
+            }
+        };
+        return csvFilesDir.listFiles(filenameFilter);
     }
 }
