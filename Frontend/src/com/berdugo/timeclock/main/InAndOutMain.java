@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 import java.util.Properties;
 
 public class InAndOutMain {
@@ -46,12 +47,9 @@ public class InAndOutMain {
 		});
 	}
 
-    private static void initLog4j() {
+    private static void initLog4j() throws IOException {
         Properties loggerProperties = new Properties();
-        loggerProperties.setProperty("log4j.rootLogger", "debug, stdout");
-        loggerProperties.setProperty("log4j.appender.stdout", "org.apache.log4j.ConsoleAppender");
-        loggerProperties.setProperty("log4j.appender.stdout.layout", "org.apache.log4j.PatternLayout");
-        loggerProperties.setProperty("log4j.appender.stdout.layout.ConversionPattern", "%5p [%t] (%F:%L) - %m%n");
+        loggerProperties.load(InAndOutMain.class.getResourceAsStream("/res/log/log4j.properties"));
         PropertyConfigurator.configure(loggerProperties);
         logger.info("(Logger initialized successfully)");
     }

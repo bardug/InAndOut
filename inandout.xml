@@ -96,6 +96,7 @@
     <property name="artifact.output.frontend:jar" value="${basedir}/out/artifacts/Frontend_jar"/>
     <property name="artifact.output.guiinfra:jar" value="${basedir}/out/artifacts/GUIInfra_jar"/>
     <property name="artifact.output.inandout:jar" value="${basedir}/out/artifacts/InAndOut_jar"/>
+    <property name="artifact.output.inandout:exe" value="${basedir}/out/artifacts/InAndOut_exe"/>
     <mkdir dir="${artifacts.temp.dir}"/>
     <property name="temp.jar.path.Backend.jar" value="${artifacts.temp.dir}/Backend.jar"/>
     <property name="temp.jar.path.Common.jar" value="${artifacts.temp.dir}/Common.jar"/>
@@ -218,6 +219,19 @@
     <!-- Delete temporary files -->
     <delete dir="${artifacts.temp.dir}"/>
   </target>
-  
-  <target name="all" depends="build.modules, build.all.artifacts" description="build all"/>
+
+
+    <taskdef name="launch4j"
+             classname="net.sf.launch4j.ant.Launch4jTask"
+             classpath="${basedir}/lib/launch4j.jar
+        :${basedir}/lib/xstream.jar" />
+
+    <target name="create-exe" depends = "build.all.artifacts">
+        <mkdir dir="${artifact.output.inandout:exe}"/>
+        <launch4j configFile="${basedir}/launch4j_config.xml" bindir=""/>
+        <!--<delete file="client.win32.jar"/>-->
+    </target>
+
+    <target name="all" depends="build.modules, build.all.artifacts" description="build all"/>
+
 </project>
