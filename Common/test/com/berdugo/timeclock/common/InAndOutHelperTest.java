@@ -1,15 +1,12 @@
-package com.berdugo.timeclock.bakcend;
+package com.berdugo.timeclock.common;
 
-
-import com.berdugo.timeclock.common.InAndOutHelper;
 import org.junit.Test;
 
 import javax.xml.bind.ValidationException;
 
 /**
- * User: Ami
- * Date: 27/05/13
- * Time: 20:26
+ * test for helper
+ * Created by Dev6 on 14/08/2014.
  */
 public class InAndOutHelperTest {
 
@@ -59,3 +56,4 @@ public class InAndOutHelperTest {
         }
     }
 }
+

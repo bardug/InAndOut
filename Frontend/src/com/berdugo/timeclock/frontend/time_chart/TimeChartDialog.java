@@ -177,7 +177,7 @@ public class TimeChartDialog extends JDialog {
             });
     }
 
-    private ActionListener getComboBoxListener(String currentMonth) {
+    private ActionListener getComboBoxListener(final String currentMonth) {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

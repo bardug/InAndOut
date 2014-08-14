@@ -374,7 +374,7 @@ public class CSVTimeRecorder implements TimeRecorder {
         FilenameFilter filenameFilter = new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
-                return name.matches(".*[.]csv");
+                return name.matches("[0-9][0-9][0-9][0-9]_[a-zA-Z][a-zA-Z][a-zA-Z][.]csv");
             }
         };
         return csvFilesDir.listFiles(filenameFilter);
