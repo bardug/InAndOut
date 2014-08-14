@@ -3,7 +3,7 @@
   <dirname property="module.common.basedir" file="${ant.file.module_common}"/>
   
   
-  <property name="compiler.args.common" value="-encoding UTF-8 -source 8 ${compiler.args}"/>
+  <property name="compiler.args.common" value="-encoding UTF-8 -source 1.7 ${compiler.args}"/>
   
   <property name="common.output.dir" value="${module.common.basedir}/../out/production/Common"/>
   <property name="common.testoutput.dir" value="${module.common.basedir}/../out/test/Common"/>

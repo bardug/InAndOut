@@ -3,7 +3,7 @@
   <dirname property="module.guiinfra.basedir" file="${ant.file.module_guiinfra}"/>
   
   
-  <property name="compiler.args.guiinfra" value="-encoding UTF-8 -source 8 ${compiler.args}"/>
+  <property name="compiler.args.guiinfra" value="-encoding UTF-8 -source 1.7 ${compiler.args}"/>
   
   <property name="guiinfra.output.dir" value="${module.guiinfra.basedir}/../out/production/GUIInfra"/>
   <property name="guiinfra.testoutput.dir" value="${module.guiinfra.basedir}/../out/test/GUIInfra"/>

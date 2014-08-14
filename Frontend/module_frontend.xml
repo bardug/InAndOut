@@ -3,7 +3,7 @@
   <dirname property="module.frontend.basedir" file="${ant.file.module_frontend}"/>
   
   
-  <property name="compiler.args.frontend" value="-encoding UTF-8 -source 8 ${compiler.args}"/>
+  <property name="compiler.args.frontend" value="-encoding UTF-8 -source 1.7 ${compiler.args}"/>
   
   <property name="frontend.output.dir" value="${module.frontend.basedir}/../out/production/Frontend"/>
   <property name="frontend.testoutput.dir" value="${module.frontend.basedir}/../out/test/Frontend"/>
