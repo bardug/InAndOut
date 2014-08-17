@@ -173,7 +173,7 @@ public class CSVTimeRecorder implements TimeRecorder {
             inOutPairsOfDay.add(inOutPair);
         }
 
-        flushIntoCSV();
+        persistTimeChart();
     }
 
     @Override
@@ -210,7 +210,7 @@ public class CSVTimeRecorder implements TimeRecorder {
     private void resetIfMonthBeginsToday() throws IOException {
         if (Calendar.getInstance().get(Calendar.DAY_OF_MONTH) == InAndOutHelper.FIRST_DAY_IN_MONTH &&
                 !thisMonthsCSV.getName().contains(getNameForMedia())) {
-            flushIntoCSV();
+            persistTimeChart();
             resetTimeChart();
             initRecorderMedia(getNameForMedia());
         }
@@ -299,7 +299,7 @@ public class CSVTimeRecorder implements TimeRecorder {
     }
 
     @Override
-    public void flushIntoCSV() throws IOException {
+    public void persistTimeChart() throws IOException {
         OutputStreamWriter writer = null;
         FileOutputStream fos = null;
         try {

@@ -16,7 +16,7 @@ public interface TimeRecorder {
 
     List<InAndOutDTO> getTimeChart() throws IOException;
 
-    void flushIntoCSV() throws IOException;
+    void persistTimeChart() throws IOException;
 
     String getNameForMedia();
 

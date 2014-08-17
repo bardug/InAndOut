@@ -31,6 +31,7 @@ public class BackendImpl implements Backend {
 		try {
 			timeRecorder.initRecorderMedia(timeRecorder.getNameForMedia());
 		} catch (IOException e) {
+            logger.error(e.getMessage());
 			callback.runCallbackWithText(e.getMessage());
 			return;
 		}
@@ -42,6 +43,7 @@ public class BackendImpl implements Backend {
 		try {
 			timeRecorder.recordInTime();
 		} catch (IOException e) {
+            logger.error(e.getMessage());
 			callback.runCallbackWithText(e.getMessage());
 			return;
 		}
@@ -54,6 +56,7 @@ public class BackendImpl implements Backend {
 		try {
 			timeRecorder.recordOutTime();
 		} catch (IOException e) {
+            logger.error(e.getMessage());
 			callback.runCallbackWithText(e.getMessage());
 			return;
 		}
@@ -62,27 +65,34 @@ public class BackendImpl implements Backend {
 
     @Override
     public Object[][] getTimeChart(Callback callback) {
+        logger.info("getting time chart...");
         List<InAndOutDTO> dtoList = null;
         try {
             dtoList = timeRecorder.getTimeChart();
         } catch (IOException e) {
+            logger.error(e.getMessage());
             callback.runCallbackWithText(e.getMessage());
         }
+        logger.info("time chart fetched");
         return InAndOutHelper.convertDTOListInto2DArray(dtoList);
     }
 
     @Override
     public void cleanAndClose(Callback callback) {
+        logger.info("writing time chart data permanently...");
         try {
-            timeRecorder.flushIntoCSV();
+            timeRecorder.persistTimeChart();
         } catch (IOException e) {
+            logger.error(e.getMessage());
             callback.runCallbackWithText(e.getMessage());
         }
+        logger.info("time chart data was written");
         callback.runCallback();
     }
 
     @Override
     public void submitTimeChart(Callback callback, Vector timeChartData) {
+        logger.info("submitting time chart...");
         try {
             timeRecorder.updateTimeChart(convertArrayToDTOList(timeChartData));
         } catch (Exception e) {
@@ -90,24 +100,33 @@ public class BackendImpl implements Backend {
             logger.error("Failed to update time chart. reason: " + e.getMessage());
             return;
         }
+        logger.info("time chart submitted");
         callback.runCallback();
     }
 
     @Override
     public String calculateTotalOfRow(DayInOutTuple dayInOutTuple, Callback callback) {
+        logger.debug("calculating total of row for day: " + dayInOutTuple.getDay());
         String s = InAndOutHelper.NA_VALUE;
         try {
             s = timeRecorder.calculateTotal(dayInOutTuple);
         } catch (Exception e) {
+            logger.error(e.getMessage());
             callback.runCallbackWithText(e.getMessage());
         }
-
+        logger.debug("total for day: " + dayInOutTuple.getDay() + ": " + s);
         return s;
     }
 
     @Override
     public String getTotalTimeForChart(Callback callback) {
-        String totalTimeForChart = timeRecorder.getTotalTimeForChart();
+        String totalTimeForChart = null;
+        try {
+            totalTimeForChart = timeRecorder.getTotalTimeForChart();
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            callback.runCallbackWithText(e.getMessage());
+        }
         logger.info("Getting total time for chart; Result: [" + totalTimeForChart + "]");
         return totalTimeForChart;
     }
@@ -130,23 +149,35 @@ public class BackendImpl implements Backend {
 
     @Override
     public Object[] getPreviousMonths(Callback callback) {
-        Object[] previousMonths = timeRecorder.getPreviousMonths();
+        logger.info("getting previous months selection...");
+        Object[] previousMonths = new Object[0];
+        try {
+            previousMonths = timeRecorder.getPreviousMonths();
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            callback.runCallbackWithText(e.getMessage());
+        }
+        logger.info("previous months were loaded: " + previousMonths);
         return previousMonths;
     }
 
     @Override
     public Object[][] loadPreviousMonth(String selectedMonth, Callback callback) {
+        logger.info("loading time sheet for " + selectedMonth + "...");
         String[] monthYearArray = selectedMonth.split(" ");
         String month = monthYearArray[0];
         String year = monthYearArray[1];
         String mediaName = timeRecorder.getNameForMedia(month, year);
+        logger.info("media info of time sheet: " + mediaName);
         List<InAndOutDTO> dtoList = null;
         try {
             timeRecorder.initRecorderMedia(mediaName);
             dtoList = timeRecorder.getTimeChart();
         } catch (IOException e) {
+            logger.error(e.getMessage());
             callback.runCallbackWithText(e.getMessage());
         }
+        logger.info("time sheet for " + selectedMonth + " was loaded");
         return InAndOutHelper.convertDTOListInto2DArray(dtoList);
     }
 }

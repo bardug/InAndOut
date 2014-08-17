@@ -64,7 +64,7 @@ public class CSVTimeRecorderTest {
     @Ignore
     public void testFlush() throws Exception {
         recordBasicInAndOut();
-        timeRecorder.flushIntoCSV();
+        timeRecorder.persistTimeChart();
 
         BufferedReader br = null;
         String line;
@@ -86,7 +86,7 @@ public class CSVTimeRecorderTest {
     @Ignore
     public void testLoad() throws Exception {
         recordBasicInAndOut();
-        timeRecorder.flushIntoCSV();
+        timeRecorder.persistTimeChart();
         timeRecorder.initRecorderMedia(csvFileName);
         List<InAndOutDTO> timeChart = timeRecorder.getTimeChart();
         InAndOutDTO inAndOutDTO = timeChart.get(0);
