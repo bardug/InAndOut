@@ -2,6 +2,7 @@ package com.berdugo.timeclock.backend;
 
 import com.berdugo.timeclock.common.Callback;
 import com.berdugo.timeclock.common.DayInOutTuple;
+import com.berdugo.timeclock.common.TimeChartStatistics;
 
 import java.util.Vector;
 
@@ -21,7 +22,7 @@ public interface Backend {
 
     String calculateTotalOfRow(DayInOutTuple dayInOutTuple, Callback callback);
 
-    String getTotalTimeForChart(Callback callback);
+    TimeChartStatistics getTimeChartStatistics(Callback callback);
 
     Object[] getPreviousMonths(Callback callback);
 

@@ -2,6 +2,7 @@ package com.berdugo.timeclock.backend;
 
 import com.berdugo.timeclock.common.DayInOutTuple;
 import com.berdugo.timeclock.common.InAndOutDTO;
+import com.berdugo.timeclock.common.TimeChartStatistics;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,7 +27,7 @@ public interface TimeRecorder {
 
     String calculateTotal(DayInOutTuple dayInOutTuple);
 
-    String getTotalTimeForChart();
+    TimeChartStatistics getTimeChartStatistics();
 
     Object[] getPreviousMonths();
 }

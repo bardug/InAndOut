@@ -3,6 +3,7 @@ package com.berdugo.timeclock.backend;
 import com.berdugo.timeclock.common.DayInOutTuple;
 import com.berdugo.timeclock.common.InAndOutDTO;
 import com.berdugo.timeclock.common.InAndOutHelper;
+import com.berdugo.timeclock.common.TimeChartStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -189,7 +190,14 @@ public class CSVTimeRecorder implements TimeRecorder {
     }
 
     @Override
-    public String getTotalTimeForChart() {
+    public TimeChartStatistics getTimeChartStatistics() {
+        String totalTimeForChart = getTotalTimeForChart();
+        int dayCount = getFullyReportedDayCount();
+        String avgPerDay = getAvgPerDay(totalTimeForChart, dayCount);
+        return new TimeChartStatistics(totalTimeForChart, dayCount, avgPerDay);
+    }
+
+    private String getTotalTimeForChart() {
         long totalTime = 0;
         for (List<InOutPair> timeChartEntry : timeChart) {
             if (timeChartEntry != null) {
@@ -205,6 +213,44 @@ public class CSVTimeRecorder implements TimeRecorder {
         }
 
         return InAndOutHelper.convertTotalMillisToHumanReadableTime(totalTime);
+    }
+
+    /**
+     * get the number of days which have both in and out reports in all their report
+     * (may be several reports for a day)
+     * @return number of fully reported days
+     */
+    private int getFullyReportedDayCount() {
+        int fullyReportedDayCount = 0;
+        for (List<InOutPair> inOutPairs : timeChart) {
+            if (inOutPairs != null) {
+                for (InOutPair pair : inOutPairs) {
+                    if (pair.getInTimeMillis() == 0L || pair.getOutTimeMillis() == 0L) {
+                        break;
+                    }
+                    fullyReportedDayCount++;
+                }
+            }
+        }
+        return fullyReportedDayCount;
+    }
+
+    private String getAvgPerDay(String totalTime, Integer dayCount) {
+        if (dayCount.equals(0)) {
+            return "0";
+        }
+        Integer totalHours = Integer.valueOf(totalTime.split(":")[0]);
+        Integer totalMins = Integer.valueOf(totalTime.split(":")[1]);
+        int hoursPerDay = totalHours / dayCount;
+        final int minutesPerHour = 60;
+        int remainingMinutes = (totalHours % dayCount) * minutesPerHour;
+        int minutesPerDay = (remainingMinutes + totalMins) / dayCount;
+        String minutesPerDayStr = String.valueOf(minutesPerDay);
+        if (minutesPerDay < 10) {
+            minutesPerDayStr = "0" + minutesPerDayStr;
+        }
+
+        return hoursPerDay + ":" + minutesPerDayStr;
     }
 
     private void resetIfMonthBeginsToday() throws IOException {

@@ -3,6 +3,7 @@ package com.berdugo.timeclock.frontend.time_chart;
 import com.berdugo.gui.buttons.BlueButton;
 import com.berdugo.timeclock.backend.Backend;
 import com.berdugo.timeclock.common.Callback;
+import com.berdugo.timeclock.common.TimeChartStatistics;
 import com.berdugo.timeclock.frontend.InAndOutErrorHandler;
 import com.berdugo.timeclock.frontend.InAndOutGUIHelper;
 
@@ -42,9 +43,9 @@ public class TimeChartDialog extends JDialog {
     private void buildUI() {
         prepareToolbar();
 
-        prepareLowerPanel();
-
         prepareInnerTable();
+
+        prepareLowerPanel();
 
         setDialogAttributes();
 
@@ -243,17 +244,19 @@ public class TimeChartDialog extends JDialog {
     }
 
     private String getTextForTotalLabel() {
-        String totalTimeForChart = backend.getTotalTimeForChart(new Callback() {
+        TimeChartStatistics timeChartStatistics = backend.getTimeChartStatistics(new Callback() {
             @Override
             public void runCallback() {
             }
 
             @Override
             public void runCallbackWithText(String text) {
+                InAndOutErrorHandler.popErrorDialog(text, getContentPane());
             }
         });
-
-        return "Total Time: " + totalTimeForChart;
+        return "Total Time: " + timeChartStatistics.getTotalTimeForChart() + " | "
+                + "Fully Reported Days: " + timeChartStatistics.getNumOfFullyReportedDays() + " | "
+                + "Avg. for Day: " + timeChartStatistics.getAvgTimePerDay();
     }
 
     private JButton getDeleteRowButton() {

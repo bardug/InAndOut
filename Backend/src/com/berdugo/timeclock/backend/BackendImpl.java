@@ -1,9 +1,6 @@
 package com.berdugo.timeclock.backend;
 
-import com.berdugo.timeclock.common.Callback;
-import com.berdugo.timeclock.common.DayInOutTuple;
-import com.berdugo.timeclock.common.InAndOutDTO;
-import com.berdugo.timeclock.common.InAndOutHelper;
+import com.berdugo.timeclock.common.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,16 +116,17 @@ public class BackendImpl implements Backend {
     }
 
     @Override
-    public String getTotalTimeForChart(Callback callback) {
-        String totalTimeForChart = null;
+    public TimeChartStatistics getTimeChartStatistics(Callback callback) {
+        TimeChartStatistics timeChartStatistics = null;
         try {
-            totalTimeForChart = timeRecorder.getTotalTimeForChart();
+            timeChartStatistics = timeRecorder.getTimeChartStatistics();
         } catch (Exception e) {
             logger.error(e.getMessage());
             callback.runCallbackWithText(e.getMessage());
         }
-        logger.info("Getting total time for chart; Result: [" + totalTimeForChart + "]");
-        return totalTimeForChart;
+        assert timeChartStatistics != null;
+        logger.info("Getting statistics for time chart; Result: [" + timeChartStatistics.toString() + "]");
+        return timeChartStatistics;
     }
 
     private List<InAndOutDTO> convertArrayToDTOList(Vector timeChartData) {
