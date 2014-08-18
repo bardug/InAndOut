@@ -111,13 +111,11 @@
       <zipfileset dir="${common.output.dir}"/>
       <zipfileset src="${basedir}/lib/slf4j-log4j12-1.7.5.jar"/>
       <zipfileset src="${basedir}/lib/xstream.jar"/>
-      <zipfileset src="${basedir}/lib/forms-1.3.0.jar"/>
       <zipfileset src="${basedir}/lib/launch4j.jar"/>
       <zipfileset src="${basedir}/lib/slf4j-api-1.7.5.jar"/>
       <zipfileset src="${basedir}/lib/junit-4.10.jar"/>
-      <zipfileset src="${basedir}/lib/jna-platform-4.0.0.jar"/>
       <zipfileset src="${basedir}/lib/log4j-1.2.14.jar"/>
-      <zipfileset src="${basedir}/lib/jna-4.0.0.jar"/>
+      <zipfileset src="${basedir}/lib/jna-4.1.0.jar"/>
     </jar>
     <copy file="${temp.jar.path.Backend.jar}" tofile="${artifact.temp.output.backend:jar}/Backend.jar"/>
   </target>
@@ -129,13 +127,11 @@
       <zipfileset dir="${common.output.dir}"/>
       <zipfileset src="${basedir}/lib/slf4j-log4j12-1.7.5.jar"/>
       <zipfileset src="${basedir}/lib/xstream.jar"/>
-      <zipfileset src="${basedir}/lib/forms-1.3.0.jar"/>
       <zipfileset src="${basedir}/lib/launch4j.jar"/>
       <zipfileset src="${basedir}/lib/slf4j-api-1.7.5.jar"/>
       <zipfileset src="${basedir}/lib/junit-4.10.jar"/>
-      <zipfileset src="${basedir}/lib/jna-platform-4.0.0.jar"/>
       <zipfileset src="${basedir}/lib/log4j-1.2.14.jar"/>
-      <zipfileset src="${basedir}/lib/jna-4.0.0.jar"/>
+      <zipfileset src="${basedir}/lib/jna-4.1.0.jar"/>
     </jar>
     <copy file="${temp.jar.path.Common.jar}" tofile="${artifact.temp.output.common:jar}/Common.jar"/>
   </target>
@@ -150,13 +146,11 @@
       <zipfileset dir="${backend.output.dir}"/>
       <zipfileset src="${basedir}/lib/slf4j-log4j12-1.7.5.jar"/>
       <zipfileset src="${basedir}/lib/xstream.jar"/>
-      <zipfileset src="${basedir}/lib/forms-1.3.0.jar"/>
       <zipfileset src="${basedir}/lib/launch4j.jar"/>
       <zipfileset src="${basedir}/lib/slf4j-api-1.7.5.jar"/>
       <zipfileset src="${basedir}/lib/junit-4.10.jar"/>
-      <zipfileset src="${basedir}/lib/jna-platform-4.0.0.jar"/>
       <zipfileset src="${basedir}/lib/log4j-1.2.14.jar"/>
-      <zipfileset src="${basedir}/lib/jna-4.0.0.jar"/>
+      <zipfileset src="${basedir}/lib/jna-4.1.0.jar"/>
     </jar>
     <copy file="${temp.jar.path.Frontend.jar}" tofile="${artifact.temp.output.frontend:jar}/Frontend.jar"/>
   </target>
@@ -181,13 +175,11 @@
       <zipfileset dir="${guiinfra.output.dir}"/>
       <zipfileset src="${basedir}/lib/slf4j-log4j12-1.7.5.jar"/>
       <zipfileset src="${basedir}/lib/xstream.jar"/>
-      <zipfileset src="${basedir}/lib/forms-1.3.0.jar"/>
       <zipfileset src="${basedir}/lib/launch4j.jar"/>
       <zipfileset src="${basedir}/lib/slf4j-api-1.7.5.jar"/>
       <zipfileset src="${basedir}/lib/junit-4.10.jar"/>
-      <zipfileset src="${basedir}/lib/jna-platform-4.0.0.jar"/>
       <zipfileset src="${basedir}/lib/log4j-1.2.14.jar"/>
-      <zipfileset src="${basedir}/lib/jna-4.0.0.jar"/>
+      <zipfileset src="${basedir}/lib/jna-4.1.0.jar"/>
     </jar>
     <copy file="${temp.jar.path.InAndOut.jar}" tofile="${artifact.temp.output.inandout:jar}/InAndOut.jar"/>
   </target>
