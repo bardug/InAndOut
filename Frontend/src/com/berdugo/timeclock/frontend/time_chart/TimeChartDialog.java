@@ -28,9 +28,7 @@ public class TimeChartDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
     private JTable table;
-//    private JButton cancelButton;
     private BlueButton cancelButton;
-//    private JButton saveButton;
     private BlueButton saveButton;
     private JLabel statusLabel;
     private JLabel totalLabel;
@@ -160,7 +158,7 @@ public class TimeChartDialog extends JDialog {
         JComboBox<Object> monthsCombo = new JComboBox<>(previousMonths);
         Object currentMonth = previousMonths[previousMonths.length - 1];
         monthsCombo.setSelectedItem(currentMonth);
-        monthsCombo.addActionListener(getComboBoxListener((String)currentMonth));
+        monthsCombo.addActionListener(getComboBoxListener());
         loadMonthPanel.add(monthsCombo);
         return loadMonthPanel;
     }
@@ -178,12 +176,11 @@ public class TimeChartDialog extends JDialog {
             });
     }
 
-    private ActionListener getComboBoxListener(final String currentMonth) {
+    private ActionListener getComboBoxListener() {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String selectedMonth = (String) ((JComboBox) e.getSource()).getSelectedItem();
-                saveButton.setEnabled(currentMonth.equals(selectedMonth));
                 Object[][] previousMonthTimeChart = backend.loadPreviousMonth(selectedMonth, new Callback() {
                     @Override
                     public void runCallback() {
@@ -303,8 +300,6 @@ public class TimeChartDialog extends JDialog {
 
     private BlueButton initSaveButton() {
         saveButton = new BlueButton("Save & Close");
-//        saveButton.setActionCommand("Save & Close");
-//        saveButton.setIcon(new ImageIcon(InAndOutGUIHelper.getSaveIcon(), "Save & Close"));
         saveButton.setToolTipText("Save & Close");
         saveButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -326,14 +321,6 @@ public class TimeChartDialog extends JDialog {
                 }
             }
         });
-
-/*
-        saveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-            }
-        });
-*/
         return saveButton;
     }
 
@@ -349,22 +336,6 @@ public class TimeChartDialog extends JDialog {
         });
         return cancelButton;
     }
-
-/*
-    private JButton initCancelButton() {
-        cancelButton = new JButton("Cancel");
-        cancelButton.setActionCommand("Cancel");
-        cancelButton.setToolTipText("Cancel");
-        cancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Window win = SwingUtilities.getWindowAncestor((Component) e.getSource());
-                win.dispose();
-            }
-        });
-        return cancelButton;
-    }
-*/
 
     private class TimeChartDialogCallback implements Callback {
         @Override

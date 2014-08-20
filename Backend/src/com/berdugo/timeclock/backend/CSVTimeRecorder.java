@@ -175,6 +175,7 @@ public class CSVTimeRecorder implements TimeRecorder {
         }
 
         persistTimeChart();
+        initRecorderMedia(getNameForMedia());   // restore current month in case a previous month was saved
     }
 
     @Override
