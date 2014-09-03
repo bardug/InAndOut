@@ -1,6 +1,7 @@
 package com.berdugo.timeclock.frontend.time_chart;
 
 import com.berdugo.gui.buttons.BlueButton;
+import com.berdugo.gui.tables.InvalidCellMarkerTable;
 import com.berdugo.timeclock.backend.Backend;
 import com.berdugo.timeclock.common.Callback;
 import com.berdugo.timeclock.common.TimeChartStatistics;

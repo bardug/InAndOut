@@ -1,4 +1,4 @@
-package com.berdugo.timeclock.frontend.time_chart;
+package com.berdugo.gui.tables;
 
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * a table that can mark cells with invalid values
  * User: ami
  * Date: 26/08/13
  * Time: 08:49

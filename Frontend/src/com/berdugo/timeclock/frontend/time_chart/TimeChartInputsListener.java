@@ -1,5 +1,7 @@
 package com.berdugo.timeclock.frontend.time_chart;
 
+import com.berdugo.gui.tables.InvalidCellMarkerTable;
+
 import javax.swing.*;
 import java.awt.*;
 
