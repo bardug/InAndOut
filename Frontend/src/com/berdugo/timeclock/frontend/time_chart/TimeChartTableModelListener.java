@@ -64,6 +64,7 @@ public class TimeChartTableModelListener extends TimeChartInputsListener impleme
     private void onSuccessfulValidation(int editedRow, DayInOutTuple dayInOutTuple) {
         table.removeInvalidCell(editedRow, TimeChartDialog.DATE_COL_INDEX);
         table.removeInvalidCell(editedRow, TimeChartDialog.TOTAL_TIME_COL_INDEX);
+        clearDisplayArea();
 
         String totalString = backend.calculateTotalOfRow(dayInOutTuple, callback);
 

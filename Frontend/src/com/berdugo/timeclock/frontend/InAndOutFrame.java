@@ -48,72 +48,13 @@ public class InAndOutFrame {
 		
 		initializeTextArea();
 
-//		initializeOutButton();
 		initializeOutLabel();
 
-//		initializeInButton();
 		initializeInLabel();
 
-//        initializeTimeChartButton();
         initializeTimeChartLabel();
-
-        initializeBackend();
-		
 	}
 
-	private void initializeBackend() {
-		backend.initTimeChart(new Callback(){
-
-			@Override
-			public void runCallback() {
-				clearTextArea();
-				displayInfo("Ready to go");
-			}
-
-			@Override
-			public void runCallbackWithText(String text) {
-				clearTextArea();
-				displayError(text);
-			}});
-	}
-
-/*
-	private void initializeInButton() {
-        JButton btnIn = new JButton();
-        btnIn.setIcon(new ImageIcon(InAndOutGUIHelper.getBatteryFullIcon()));
-        btnIn.setToolTipText("IN");
-
-        btnIn.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                clearTextArea();
-            }
-        });
-        btnIn.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                clearTextArea();
-                displayInfo("IN pressed");
-                backend.signIn(new Callback() {
-
-                    @Override
-                    public void runCallback() {
-                        clearTextArea();
-                        restartTimer(DEFAULT_DELAY_FOR_OUT_REMINDER_MILLIS, "Don't forget to sign out soon");
-                        displayInfo("IN time recorded successfully");
-                    }
-
-                    @Override
-                    public void runCallbackWithText(String text) {
-                        displayInfo(text);
-                    }
-                });
-            }
-        });
-		btnIn.setBounds(60, 60, 130, 130);
-		frmInOut.getContentPane().add(btnIn);
-	}
-*/
 	private void initializeInLabel() {
         final JLabel inLabel = new JLabel(new ImageIcon(InAndOutGUIHelper.getBatteryFullIcon()));
         inLabel.setToolTipText("IN");
@@ -155,7 +96,6 @@ public class InAndOutFrame {
         });
 
 		inLabel.setBounds(90, 60, 90, 130);
-//        inLabel.setBorder(new TitledBorder(""));
 		frmInOut.getContentPane().add(inLabel);
 	}
 
@@ -175,35 +115,6 @@ public class InAndOutFrame {
         timer.start();
     }
 
-/*
-    private void initializeTimeChartButton() {
-        JButton btnTimeChart = new JButton();
-        btnTimeChart.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                clearTextArea();
-            }
-        });
-        btnTimeChart.setBounds(10, 10, 30, 30);
-        btnTimeChart.setIcon(new ImageIcon(InAndOutGUIHelper.getTableIcon()));
-        btnTimeChart.setToolTipText("View/Edit Time Sheet");
-        btnTimeChart.setFocusPainted(false);
-        frmInOut.getContentPane().add(btnTimeChart);
-        btnTimeChart.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                try {
-                    TimeChartDialog dialog = new TimeChartDialog(backend);
-                    dialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
-                    dialog.setLocationRelativeTo(frmInOut);
-                    dialog.setVisible(true);
-                } catch (Exception ex) {
-                    System.out.println("REJECTED " + "_" + getClass().getName() + "_" + getClass().getEnclosingMethod() + "_" + ex.getMessage());
-                }
-            }
-        });
-    }
-*/
 
     private void initializeTimeChartLabel() {
         final JLabel timeChartLabel = new JLabel(new ImageIcon(InAndOutGUIHelper.getEditIcon()));
@@ -240,42 +151,6 @@ public class InAndOutFrame {
             }
         });
     }
-
-/*
-    private void initializeOutButton() {
-        JButton btnOut = new JButton("OUT");
-		btnOut.setFont(new Font("Tahoma", Font.BOLD, 40));
-		btnOut.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                clearTextArea();
-            }
-        });
-        btnOut.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                clearTextArea();
-                displayInfo("OUT pressed");
-                backend.signOut(new Callback() {
-
-                    @Override
-                    public void runCallback() {
-                        clearTextArea();
-                        restartTimer(DEFAULT_DELAY_FOR_IN_REMINDER_MILLIS, "Good Morning Miss Sunshine!");
-                        displayInfo("OUT time recorded successfully");
-                    }
-
-                    @Override
-                    public void runCallbackWithText(String text) {
-                        displayInfo(text);
-                    }
-                });
-            }
-        });
-		btnOut.setBounds(250, 60, 135, 107);
-		frmInOut.getContentPane().add(btnOut);
-	}
-*/
 
     private void initializeOutLabel() {
         final JLabel outLabel = new JLabel(new ImageIcon(InAndOutGUIHelper.getBatteryEmptyIcon()) );
@@ -318,7 +193,6 @@ public class InAndOutFrame {
             }
         });
 		outLabel.setBounds(270, 60, 90, 130);
-//        outLabel.setBorder(new TitledBorder(""));
 		frmInOut.getContentPane().add(outLabel);
 	}
 
@@ -327,7 +201,9 @@ public class InAndOutFrame {
 		textArea.setHorizontalAlignment(SwingConstants.CENTER);
 		textArea.setBounds(60, 230, 325, 40);
         textArea.setBorder(new TitledBorder(""));
-		frmInOut.getContentPane().add(textArea);
+        displayInfo("Ready to go");
+
+        frmInOut.getContentPane().add(textArea);
 	}
 
 	private void initializeFrame() {
@@ -408,12 +284,10 @@ public class InAndOutFrame {
         backend.cleanAndClose(new Callback() {
             @Override
             public void runCallback() {
-                //To change body of implemented methods use File | Settings | File Templates.
             }
 
             @Override
             public void runCallbackWithText(String text) {
-                //To change body of implemented methods use File | Settings | File Templates.
             }
         });
     }

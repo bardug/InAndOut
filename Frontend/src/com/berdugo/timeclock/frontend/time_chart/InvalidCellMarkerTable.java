@@ -14,16 +14,15 @@ import java.util.Set;
 public class InvalidCellMarkerTable extends JTable {
 
     private Set<TableCell> invalidCells;
-    private JComponent dependingComponent;
-    private JLabel statusDisplayArea;
+    private Component[] dependingComponents;
 
 
 
-    public InvalidCellMarkerTable(JComponent dependingComponent, JLabel statusDisplayArea) {
+    public InvalidCellMarkerTable(Component... dependingComponents) {
         super();
-        this.dependingComponent = dependingComponent;
+        this.dependingComponents = dependingComponents;
         this.invalidCells = new HashSet<>();
-        this.statusDisplayArea = statusDisplayArea;
+        putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
     }
 
     @Override
@@ -47,7 +46,7 @@ public class InvalidCellMarkerTable extends JTable {
      */
     public void addInvalidCell(int row, int col) {
         invalidCells.add(new TableCell(row, col));
-        if ( dependingComponent != null ) {
+        if ( dependingComponents != null ) {
             disableDependantComponent();
         }
     }
@@ -57,10 +56,9 @@ public class InvalidCellMarkerTable extends JTable {
      */
     public void removeInvalidCell(int row, int col) {
         invalidCells.remove(new TableCell(row, col));
-        if ( dependingComponent != null ) {
+        if ( dependingComponents != null ) {
             if ( !hasInvalidCells() ) {
                 enableDependantComponent();
-                clearDisplayArea();
             }
         }
     }
@@ -74,15 +72,15 @@ public class InvalidCellMarkerTable extends JTable {
     }
 
     private void disableDependantComponent() {
-        dependingComponent.setEnabled(false);
+        for ( Component component : dependingComponents ) {
+            component.setEnabled(false);
+        }
     }
 
     private void enableDependantComponent() {
-        dependingComponent.setEnabled(true);
-    }
-
-    protected void clearDisplayArea() {
-        statusDisplayArea.setText("");
+        for ( Component component : dependingComponents ) {
+            component.setEnabled(true);
+        }
     }
 
 

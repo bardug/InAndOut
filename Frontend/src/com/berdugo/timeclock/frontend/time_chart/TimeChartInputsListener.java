@@ -23,4 +23,7 @@ public abstract class TimeChartInputsListener {
         statusDisplayArea.setForeground(new Color(219, 74, 55));
     }
 
+    protected void clearDisplayArea() {
+        statusDisplayArea.setText("");
+    }
 }

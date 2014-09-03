@@ -10,8 +10,8 @@ public class TimeChartTableModel extends DefaultTableModel {
     public static Object[] TIME_CHART_COL_NAMES = new Object[] {"Date", "IN", "OUT", "Total", "ID"};
     private boolean lastRowEditable;
 
-    public TimeChartTableModel(Object[][] data) {
-        super(data, TIME_CHART_COL_NAMES);
+    public TimeChartTableModel() {
+        super(TIME_CHART_COL_NAMES, 0);
         lastRowEditable = false;
     }
 

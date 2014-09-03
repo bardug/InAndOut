@@ -31,6 +31,7 @@ public class TimeChartDialog extends JDialog {
     private BlueButton cancelButton;
     private BlueButton saveButton;
     private JLabel statusLabel;
+    private JComboBox<Object> monthsCombo;
     private JLabel totalLabel;
 
     public TimeChartDialog(Backend backend) {
@@ -39,15 +40,26 @@ public class TimeChartDialog extends JDialog {
     }
 
     private void buildUI() {
-        prepareToolbar();
+        initMemberComponents();
 
         prepareInnerTable();
 
         prepareLowerPanel();
 
+        prepareToolbar();
+
         setDialogAttributes();
 
         addListeners();
+    }
+
+    private void initMemberComponents() {
+        initSaveButton();
+        initCancelButton();
+        statusLabel = new JLabel();
+        monthsCombo = new JComboBox<>();
+        prepareTable();
+        totalLabel = getTotalTimeLabel();
     }
 
     private void prepareToolbar() {
@@ -68,7 +80,11 @@ public class TimeChartDialog extends JDialog {
         toolBar.addSeparator();
         toolBar.add(getDeleteRowButton(), westConstraints);
         toolBar.addSeparator();
-        statusLabel = new JLabel();
+
+        JPanel loadMonthPanel = getLoadMonthPanel();
+        toolBar.add(loadMonthPanel, westConstraints);
+        toolBar.addSeparator();
+
         toolBar.add(statusLabel, eastConstraints);
         getContentPane().add(toolBar, BorderLayout.NORTH);
     }
@@ -87,13 +103,11 @@ public class TimeChartDialog extends JDialog {
     }
 
     private void prepareTable() {
-        table = new InvalidCellMarkerTable(saveButton, statusLabel);
-        table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+        table = new InvalidCellMarkerTable(saveButton, monthsCombo);
     }
 
     private void prepareModel() {
-        Object[][] tableModel2DArray = backend.getTimeChart(new TimeChartDialogCallback());
-        table.setModel(new TimeChartTableModel(tableModel2DArray));
+        table.setModel(new TimeChartTableModel());
 
         addModelListener();
     }
@@ -145,35 +159,31 @@ public class TimeChartDialog extends JDialog {
 
         lowerPanel.add(getButtonsPanel(), BorderLayout.SOUTH);
 
-        JPanel loadMonthPanel = getLoadMonthPanel();
-        lowerPanel.add(loadMonthPanel,BorderLayout.NORTH);
-
         getContentPane().add(lowerPanel, BorderLayout.SOUTH);
     }
 
     private JPanel getLoadMonthPanel() {
         JPanel loadMonthPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        loadMonthPanel.add(new JLabel("Load some other month:"));
-        Object[] previousMonths = getPreviousMonths();
-        JComboBox<Object> monthsCombo = new JComboBox<>(previousMonths);
-        Object currentMonth = previousMonths[previousMonths.length - 1];
-        monthsCombo.setSelectedItem(currentMonth);
+        Object[] monthList = getMonthList();
+        monthsCombo.setModel(new DefaultComboBoxModel<>(monthList));
+        Object currentMonth = monthList[monthList.length - 1];
         monthsCombo.addActionListener(getComboBoxListener());
+        monthsCombo.setSelectedItem(currentMonth);
         loadMonthPanel.add(monthsCombo);
         return loadMonthPanel;
     }
 
-    private Object[] getPreviousMonths() {
-        return backend.getPreviousMonths(new Callback() {
-                @Override
-                public void runCallback() {
-                }
+    private Object[] getMonthList() {
+        return backend.getMonthList(new Callback() {
+            @Override
+            public void runCallback() {
+            }
 
-                @Override
-                public void runCallbackWithText(String text) {
-                    InAndOutErrorHandler.popErrorDialog(text, getContentPane());
-                }
-            });
+            @Override
+            public void runCallbackWithText(String text) {
+                InAndOutErrorHandler.popErrorDialog(text, getContentPane());
+            }
+        });
     }
 
     private ActionListener getComboBoxListener() {
@@ -181,7 +191,7 @@ public class TimeChartDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String selectedMonth = (String) ((JComboBox) e.getSource()).getSelectedItem();
-                Object[][] previousMonthTimeChart = backend.loadPreviousMonth(selectedMonth, new Callback() {
+                Object[][] selectedMonthTimeChart = backend.loadMonth(selectedMonth, new Callback() {
                     @Override
                     public void runCallback() {
                     }
@@ -191,7 +201,7 @@ public class TimeChartDialog extends JDialog {
                         InAndOutErrorHandler.popErrorDialog(text, getContentPane());
                     }
                 });
-                ((DefaultTableModel) table.getModel()).setDataVector(previousMonthTimeChart, TimeChartTableModel.TIME_CHART_COL_NAMES);
+                ((DefaultTableModel) table.getModel()).setDataVector(selectedMonthTimeChart, TimeChartTableModel.TIME_CHART_COL_NAMES);
                 fixColumnsAndPrepareCellAttributes();
             }
         };
@@ -217,10 +227,8 @@ public class TimeChartDialog extends JDialog {
         eastConstraints.weightx = 0;
         eastConstraints.insets = new Insets(0,5,5,5);
 
-        initSaveButton();
         buttonsPane.add(saveButton, eastConstraints);
 
-        initCancelButton();
         eastConstraints.insets = new Insets(0,0,5,5);
         buttonsPane.add(cancelButton, eastConstraints);
 
@@ -230,7 +238,6 @@ public class TimeChartDialog extends JDialog {
 
     private JPanel getTotalPanel() {
         JPanel totalPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-        totalLabel = getTotalTimeLabel();
         totalPanel.setBorder(new TitledBorder(""));
         totalPanel.add(totalLabel);
         return totalPanel;
@@ -304,21 +311,19 @@ public class TimeChartDialog extends JDialog {
         saveButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if ( saveButton.isEnabled() ) {
-                    final Component ancestor = (Component) e.getSource();
-                    backend.submitTimeChart(new Callback() {
-                        @Override
-                        public void runCallback() {
-                            Window win = SwingUtilities.getWindowAncestor(ancestor);
-                            win.dispose();
-                        }
+                final Component ancestor = (Component) e.getSource();
+                backend.submitTimeChart(new Callback() {
+                    @Override
+                    public void runCallback() {
+                        Window win = SwingUtilities.getWindowAncestor(ancestor);
+                        win.dispose();
+                    }
 
-                        @Override
-                        public void runCallbackWithText(String text) {
-                            InAndOutErrorHandler.popErrorDialog(text, getContentPane());
-                        }
-                    }, ((TimeChartTableModel) table.getModel()).getDataVector());
-                }
+                    @Override
+                    public void runCallbackWithText(String text) {
+                        InAndOutErrorHandler.popErrorDialog(text, getContentPane());
+                    }
+                }, ((TimeChartTableModel) table.getModel()).getDataVector());
             }
         });
         return saveButton;
@@ -329,9 +334,19 @@ public class TimeChartDialog extends JDialog {
         cancelButton.setToolTipText("Cancel");
         cancelButton.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                Window win = SwingUtilities.getWindowAncestor((Component) e.getSource());
-                win.dispose();
+            public void mouseClicked(final MouseEvent e) {
+                backend.closeTimeChart(new Callback() {
+                    @Override
+                    public void runCallback() {
+                        Window win = SwingUtilities.getWindowAncestor((Component) e.getSource());
+                        win.dispose();
+                    }
+
+                    @Override
+                    public void runCallbackWithText(String text) {
+                        InAndOutErrorHandler.popErrorDialog(text, getContentPane());
+                    }
+                });
             }
         });
         return cancelButton;
@@ -362,8 +377,19 @@ public class TimeChartDialog extends JDialog {
                     public void windowOpened(WindowEvent e) {
                         cancelButton.requestFocus();
                     }
-                    public void windowClosing(WindowEvent e) {
-                        dispose();
+                    public void windowClosing(final WindowEvent e) {
+                        backend.closeTimeChart(new Callback() {
+                            @Override
+                            public void runCallback() {
+                                Window win = SwingUtilities.getWindowAncestor((Component) e.getSource());
+                                win.dispose();
+                            }
+
+                            @Override
+                            public void runCallbackWithText(String text) {
+                                InAndOutErrorHandler.popErrorDialog(text, getContentPane());
+                            }
+                        });
                     }
                 });
     }

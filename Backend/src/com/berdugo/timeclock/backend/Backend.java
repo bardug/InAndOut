@@ -8,13 +8,11 @@ import java.util.Vector;
 
 public interface Backend {
 	
-	void initTimeChart(Callback callback);
-	
 	void signIn(Callback callback);
 	
 	void signOut(Callback callback);
 
-    Object[][] getTimeChart(Callback callback);
+    void closeTimeChart(Callback callback);
 
     void cleanAndClose(Callback callback);
 
@@ -24,7 +22,7 @@ public interface Backend {
 
     TimeChartStatistics getTimeChartStatistics(Callback callback);
 
-    Object[] getPreviousMonths(Callback callback);
+    Object[] getMonthList(Callback callback);
 
-    Object[][] loadPreviousMonth(String selectedMonth, Callback callback);
+    Object[][] loadMonth(String selectedMonth, Callback callback);
 }

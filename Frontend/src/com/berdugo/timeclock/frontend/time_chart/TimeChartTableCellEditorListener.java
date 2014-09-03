@@ -44,7 +44,7 @@ public abstract class TimeChartTableCellEditorListener extends TimeChartInputsLi
         }
 
         table.removeInvalidCell(table.getSelectedRow(), table.getSelectedColumn());
-
+        clearDisplayArea();
     }
 
     @Override

@@ -24,6 +24,8 @@ public class CSVTimeRecorder implements TimeRecorder {
     public static final String PARENT_DIR_NOTATION = "..";
 	public static final String FILE_SEPARATOR = "file.separator";
 
+    private static final int TIME_CHART_SIZE = InAndOutHelper.MAX_DAYS_IN_MONTH + 1;
+
     private static final String CSV_DELIMITER = ",";
 
     private List<InOutPair> timeChart[];
@@ -36,18 +38,22 @@ public class CSVTimeRecorder implements TimeRecorder {
 
     public CSVTimeRecorder() {
         //noinspection unchecked
-        this.timeChart = new List[InAndOutHelper.MAX_DAYS_IN_MONTH];
+        this.timeChart = new List[TIME_CHART_SIZE];
         try {
             random = SecureRandom.getInstance("SHA1PRNG");
         } catch (NoSuchAlgorithmException e) {
             // if i get here, i go home
             e.printStackTrace();
         }
+        try {
+            initRecorderMedia(getNameForMedia());
+        } catch (IOException e) {
+            logger.error("failed to initialize time recorder " + e.getMessage());
+        }
     }
 
 
-    @Override
-	public void initRecorderMedia(String mediaName) throws IOException {
+	private void initRecorderMedia(String mediaName) throws IOException {
 		logger.info("Initializing Recorder Media. Media is CSV File");
 
         File parentFolder = getCSVFilesDir();
@@ -60,24 +66,10 @@ public class CSVTimeRecorder implements TimeRecorder {
 
         resetTimeChart();
 
-		if (thisMonthsCSV.exists()) {
-            logger.debug(String.format("File %s was found. loading its content", thisMonthsCSV));
-            loadCSV();
-		}
-        else if (parentFolder.exists()){
-            logger.debug(String.format("File %s is not found. Creating file", thisMonthsCSV));
-			createCSVFile();
-		} else {
-            logger.debug(String.format("File %s is not found. Creating file and all parent dirs", thisMonthsCSV));
-            boolean mkdirsResult = parentFolder.mkdirs();
-            if (!mkdirsResult) {
-                throw new RuntimeException("Failed to create parent dirs and file");
-            }
-            createCSVFile();
-		}
-	}
+        createCsvOrLoadIfExists(parentFolder);
+    }
 
-    private File getCSVFilesDir() {
+    protected File getCSVFilesDir() {
         JFileChooser fr = new JFileChooser();
         FileSystemView fw = fr.getFileSystemView();
 
@@ -89,23 +81,44 @@ public class CSVTimeRecorder implements TimeRecorder {
         return csvFilesDir;
     }
 
+    private void createCsvOrLoadIfExists(File parentFolder) throws IOException {
+        if ( thisMonthsCSV.exists() ) {
+            logger.debug(String.format("File %s was found. loading its content", thisMonthsCSV));
+            loadCSV();
+        } else if ( parentFolder.exists() ) {
+            logger.debug(String.format("File %s is not found. Creating file", thisMonthsCSV));
+            createCSVFile();
+        } else {
+            logger.debug(String.format("File %s is not found. Creating file and all parent dirs", thisMonthsCSV));
+            boolean mkdirsResult = parentFolder.mkdirs();
+            if ( !mkdirsResult ) {
+                throw new RuntimeException("Failed to create parent dirs and file");
+            }
+            createCSVFile();
+        }
+    }
+
+    @Override
+    public void closeTimeChart() throws IOException {
+        verifyCurrentMonthIsLoaded();
+    }
+
     @Override
     public void recordInTime() throws IOException {
-        resetIfMonthBeginsToday();
-        long now = System.currentTimeMillis();
-
         List<InOutPair> inOutPairsOfToday = getInOutPairsOfToday();
         if (inOutPairsOfToday == null) {
             inOutPairsOfToday = new ArrayList<>();
             timeChart[Calendar.getInstance().get(Calendar.DAY_OF_MONTH)] = inOutPairsOfToday;
         }
+
+        long now = System.currentTimeMillis();
         InOutPair inOutPair = new InOutPair(now, 0L, random.nextInt());
         inOutPairsOfToday.add(inOutPair);
+        persistTimeChart();
     }
 
     @Override
     public void recordOutTime() throws IOException {
-        resetIfMonthBeginsToday();
         long now = System.currentTimeMillis();
 
         List<InOutPair> inOutPairsOfToday = getInOutPairsOfToday();
@@ -113,33 +126,35 @@ public class CSVTimeRecorder implements TimeRecorder {
             inOutPairsOfToday = new ArrayList<>();
             timeChart[Calendar.getInstance().get(Calendar.DAY_OF_MONTH)] = inOutPairsOfToday;
             inOutPairsOfToday.add(new InOutPair(0L, now, random.nextInt()));
-            return;
         }
-        InOutPair todaysLastInOutPair = inOutPairsOfToday.get(inOutPairsOfToday.size() - 1);
-        if (todaysLastInOutPair.getOutTimeMillis().equals(0L)) {
-            todaysLastInOutPair.setOutTimeMillis(now);
-        } else {
-            inOutPairsOfToday.add(new InOutPair(0L, now, random.nextInt()));
+        else {
+            InOutPair todaysLastInOutPair = inOutPairsOfToday.get(inOutPairsOfToday.size() - 1);
+            if (todaysLastInOutPair.getOutTimeMillis().equals(0L)) {
+                todaysLastInOutPair.setOutTimeMillis(now);
+            } else {
+                inOutPairsOfToday.add(new InOutPair(0L, now, random.nextInt()));
+            }
         }
+        persistTimeChart();
     }
 
     @Override
-    public List<InAndOutDTO> getTimeChart() throws IOException {
-        return  composeDTOList();
+    public List<InAndOutDTO> getTimeChart(String month, String year) throws IOException {
+        initRecorderMedia(getNameForMedia(month, year));
+        return composeDTOList(month);
     }
 
-    @Override
-    public String getNameForMedia() {
+    private String getNameForMedia() {
         int year = Calendar.getInstance().get(Calendar.YEAR);
         String month = Calendar.getInstance().getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.ENGLISH);
-        return getNameForMedia(String.valueOf(year), month);
+        return getNameForMedia(month, String.valueOf(year));
     }
 
-    public String getNameForMedia(String month, String year) {
+    private String getNameForMedia(String month, String year) {
         StringBuilder sb = new StringBuilder();
-        sb.append(month);
-        sb.append(FILE_NAME_MONTH_YEAR_DELIMITER);
         sb.append(year);
+        sb.append(FILE_NAME_MONTH_YEAR_DELIMITER);
+        sb.append(month);
         return sb.toString();
     }
 
@@ -175,7 +190,7 @@ public class CSVTimeRecorder implements TimeRecorder {
         }
 
         persistTimeChart();
-        initRecorderMedia(getNameForMedia());   // restore current month in case a previous month was saved
+        verifyCurrentMonthIsLoaded();
     }
 
     @Override
@@ -254,17 +269,21 @@ public class CSVTimeRecorder implements TimeRecorder {
         return hoursPerDay + ":" + minutesPerDayStr;
     }
 
-    private void resetIfMonthBeginsToday() throws IOException {
-        if (Calendar.getInstance().get(Calendar.DAY_OF_MONTH) == InAndOutHelper.FIRST_DAY_IN_MONTH &&
-                !thisMonthsCSV.getName().contains(getNameForMedia())) {
+    /**
+     * verifies that the current month is loaded:
+     * <p/>&nbsp; 1. in case it is the first day in month
+     * <p/>&nbsp; 2. in case the current month was not loaded at the time the was closed
+     * @throws IOException
+     */
+    private void verifyCurrentMonthIsLoaded() throws IOException {
+        if (!thisMonthsCSV.getName().contains(getNameForMedia())) {
             persistTimeChart();
-            resetTimeChart();
             initRecorderMedia(getNameForMedia());
         }
     }
 
     private void  resetTimeChart() {
-        for (int i = 0 ; i < InAndOutHelper.MAX_DAYS_IN_MONTH ; i ++) {
+        for (int i = 0 ; i < TIME_CHART_SIZE ; i ++) {
             timeChart[i] = null; // todo assigning a null value is not a good practice
         }
     }
@@ -274,7 +293,7 @@ public class CSVTimeRecorder implements TimeRecorder {
         return timeChart[dayOfMonth];
     }
 
-    private List<InAndOutDTO> composeDTOList() throws IOException {
+    private List<InAndOutDTO> composeDTOList(String month) throws IOException {
 
         List<InAndOutDTO> dtoList = new ArrayList<InAndOutDTO>();
 
@@ -283,8 +302,8 @@ public class CSVTimeRecorder implements TimeRecorder {
                 for ( InOutPair pair : timeChart[i] ) {
                     InAndOutDTO dto = new InAndOutDTO();
 
-                    int month = Calendar.getInstance().get(Calendar.MONTH) + InAndOutHelper.CALENDAR_MONTH_OFFSET;
-                    String date = String.valueOf(i) + InAndOutHelper.DAY_MONTH_DELIMITER + String.valueOf(month);
+                    int monthNum = MonthsComparator.orderedListOfMonths.get(month);
+                    String date = String.valueOf(i) + InAndOutHelper.DAY_MONTH_DELIMITER + String.valueOf(monthNum);
                     dto.setDate(date);
 
                     Long inTimeMillis = pair.getInTimeMillis();

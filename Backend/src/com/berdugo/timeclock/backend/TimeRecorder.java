@@ -9,19 +9,15 @@ import java.util.List;
 
 public interface TimeRecorder {
 
-    void initRecorderMedia(String mediaName) throws IOException;
+    void closeTimeChart() throws IOException;
 
     public void recordInTime() throws IOException;
 
     public void recordOutTime() throws IOException;
 
-    List<InAndOutDTO> getTimeChart() throws IOException;
+    List<InAndOutDTO> getTimeChart(String month, String year) throws IOException;
 
     void persistTimeChart() throws IOException;
-
-    String getNameForMedia();
-
-    String getNameForMedia(String month, String year);
 
     void updateTimeChart(List<InAndOutDTO> dtos) throws Exception;
 

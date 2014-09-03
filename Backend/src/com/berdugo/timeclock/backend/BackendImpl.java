@@ -23,17 +23,6 @@ public class BackendImpl implements Backend {
 		timeRecorder = new CSVTimeRecorder();
 	}
 
-	@Override
-	public void initTimeChart(Callback callback) {
-		try {
-			timeRecorder.initRecorderMedia(timeRecorder.getNameForMedia());
-		} catch (IOException e) {
-            logger.error(e.getMessage());
-			callback.runCallbackWithText(e.getMessage());
-			return;
-		}
-		callback.runCallback();
-	}
 
 	@Override
 	public void signIn(Callback callback) {	
@@ -61,17 +50,16 @@ public class BackendImpl implements Backend {
 	}
 
     @Override
-    public Object[][] getTimeChart(Callback callback) {
-        logger.info("getting time chart...");
-        List<InAndOutDTO> dtoList = null;
+    public void closeTimeChart(Callback callback) {
+        logger.info("closing time chart...");
         try {
-            dtoList = timeRecorder.getTimeChart();
+            timeRecorder.closeTimeChart();
         } catch (IOException e) {
             logger.error(e.getMessage());
             callback.runCallbackWithText(e.getMessage());
         }
-        logger.info("time chart fetched");
-        return InAndOutHelper.convertDTOListInto2DArray(dtoList);
+        logger.info("time chart data was closed");
+        callback.runCallback();
     }
 
     @Override
@@ -93,8 +81,8 @@ public class BackendImpl implements Backend {
         try {
             timeRecorder.updateTimeChart(convertArrayToDTOList(timeChartData));
         } catch (Exception e) {
-            callback.runCallbackWithText("Failed to update time chart. reason: " + e.getMessage());
-            logger.error("Failed to update time chart. reason: " + e.getMessage());
+            callback.runCallbackWithText("Failed to update time chart. reason: " + e);
+            logger.error("Failed to update time chart. reason: " + e);
             return;
         }
         logger.info("time chart submitted");
@@ -146,7 +134,7 @@ public class BackendImpl implements Backend {
     }
 
     @Override
-    public Object[] getPreviousMonths(Callback callback) {
+    public Object[] getMonthList(Callback callback) {
         logger.info("getting previous months selection...");
         Object[] previousMonths = new Object[0];
         try {
@@ -160,17 +148,14 @@ public class BackendImpl implements Backend {
     }
 
     @Override
-    public Object[][] loadPreviousMonth(String selectedMonth, Callback callback) {
+    public Object[][] loadMonth(String selectedMonth, Callback callback) {
         logger.info("loading time sheet for " + selectedMonth + "...");
         String[] monthYearArray = selectedMonth.split(" ");
-        String month = monthYearArray[0];
-        String year = monthYearArray[1];
-        String mediaName = timeRecorder.getNameForMedia(month, year);
-        logger.info("media info of time sheet: " + mediaName);
+        String year = monthYearArray[0];
+        String month = monthYearArray[1];
         List<InAndOutDTO> dtoList = null;
         try {
-            timeRecorder.initRecorderMedia(mediaName);
-            dtoList = timeRecorder.getTimeChart();
+            dtoList = timeRecorder.getTimeChart(month, year);
         } catch (IOException e) {
             logger.error(e.getMessage());
             callback.runCallbackWithText(e.getMessage());
