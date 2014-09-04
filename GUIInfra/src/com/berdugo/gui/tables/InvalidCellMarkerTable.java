@@ -1,7 +1,9 @@
 package com.berdugo.gui.tables;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,16 +16,31 @@ import java.util.Set;
  */
 public class InvalidCellMarkerTable extends JTable {
 
+    protected static final int DEFAULT_ROW_HEIGHT = 20;
+
     private Set<TableCell> invalidCells;
     private Component[] dependingComponents;
 
 
 
-    public InvalidCellMarkerTable(Component... dependingComponents) {
-        super();
+    public InvalidCellMarkerTable(TableModel dm, Component... dependingComponents) {
+        super(dm);
         this.dependingComponents = dependingComponents;
         this.invalidCells = new HashSet<>();
         putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+        setRowHeight(DEFAULT_ROW_HEIGHT);
+        prepareCellAttributes();
+        prepareHeaderRenderer();
+    }
+
+    private void prepareCellAttributes() {
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        setDefaultRenderer(String.class, centerRenderer);
+    }
+
+    private void prepareHeaderRenderer() {
+        getTableHeader().setDefaultRenderer(new DefaultTableHeaderCellRenderer());
     }
 
     @Override

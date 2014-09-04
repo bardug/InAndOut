@@ -9,10 +9,9 @@ import com.berdugo.timeclock.frontend.InAndOutErrorHandler;
 import com.berdugo.timeclock.frontend.InAndOutGUIHelper;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
@@ -96,27 +95,19 @@ public class TimeChartDialog extends JDialog {
 
         getContentPane().add(new JScrollPane(table));
 
-        prepareHeaderRenderer();
-
-        prepareModel();
+        addModelListener();
 
         fixColumnsAndPrepareCellAttributes();
     }
 
     private void prepareTable() {
-        table = new InvalidCellMarkerTable(saveButton, monthsCombo);
-    }
-
-    private void prepareModel() {
-        table.setModel(new TimeChartTableModel());
-
-        addModelListener();
+        table = new InvalidCellMarkerTable(new TimeChartTableModel(), saveButton, monthsCombo);
     }
 
     private void fixColumnsAndPrepareCellAttributes() {
         table.removeColumn(table.getColumn("ID"));
 
-        prepareCellAttributes();
+        prepareCellEditor();
     }
 
     private void addModelListener() {
@@ -132,13 +123,9 @@ public class TimeChartDialog extends JDialog {
         table.getModel().addTableModelListener(totalChangeListener);
     }
 
-    private void prepareCellAttributes() {
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-
-        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+    private void prepareCellEditor() {
         for ( int i = 0 ; i < table.getColumnCount() ; i++) {
             TableColumn column = table.getColumnModel().getColumn(i);
-            column.setCellRenderer(centerRenderer);
             DefaultCellEditor cellEditor = new DefaultCellEditor(new JTextField());
             if (i == DATE_COL_INDEX ) {
                 cellEditor.addCellEditorListener(new DateCellEditorListener((InvalidCellMarkerTable) table, statusLabel));
@@ -150,15 +137,13 @@ public class TimeChartDialog extends JDialog {
         }
     }
 
-    private void prepareHeaderRenderer() {
-        table.getTableHeader().setDefaultRenderer(new DefaultTableHeaderCellRenderer());
-    }
 
     private void prepareLowerPanel() {
         JPanel lowerPanel = new JPanel();
         lowerPanel.setLayout(new BorderLayout());
 
         lowerPanel.add(getButtonsPanel(), BorderLayout.SOUTH);
+        lowerPanel.setBorder(new EmptyBorder(5,0,0,0));
 
         getContentPane().add(lowerPanel, BorderLayout.SOUTH);
     }
@@ -239,7 +224,7 @@ public class TimeChartDialog extends JDialog {
 
     private JPanel getTotalPanel() {
         JPanel totalPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-        totalPanel.setBorder(new TitledBorder(""));
+        totalPanel.setBorder(new EmptyBorder(3,0,0,0));
         totalPanel.add(totalLabel);
         return totalPanel;
     }

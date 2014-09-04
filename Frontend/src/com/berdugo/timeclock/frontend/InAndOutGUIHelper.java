@@ -80,10 +80,6 @@ public class InAndOutGUIHelper {
         return getIconByPath("/res/delete.png");
     }
 
-    public static Image getSaveIcon() {
-        return getIconByPath("/res/save.png");
-    }
-
     public static Image getBatteryFullIcon() {
         return getIconByPath("/res/battery_full.png");
     }

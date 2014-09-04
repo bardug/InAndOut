@@ -1,4 +1,4 @@
-package com.berdugo.timeclock.frontend.time_chart;
+package com.berdugo.gui.tables;
 
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
